@@ -1,10 +1,17 @@
 package com.xlh.dubbo.zipkin.demo.service.hello;
 
+import com.xlh.dubbo.zipkin.demo.api.CongratulationService;
 import com.xlh.dubbo.zipkin.demo.api.HelloService;
 
 import java.util.Random;
 
 public class HelloServiceImpl implements HelloService {
+    private CongratulationService congratulationService;
+
+    public void setCongratulationService(CongratulationService congratulationService) {
+        this.congratulationService = congratulationService;
+    }
+
     @Override
     public String hello(String message) {
         try {
@@ -12,6 +19,6 @@ public class HelloServiceImpl implements HelloService {
         } catch (InterruptedException e) {
 
         }
-        return "hello, " + message;
+        return "hello, " + congratulationService.congratulation(message);
     }
 }

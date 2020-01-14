@@ -7,23 +7,22 @@
     http://www.springframework.org/schema/beans/spring-beans.xsd
     http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
     <!-- 定义 HelloService 的应用名 -->
-    <dubbo:application name="hello-service-provider"/>
+    <dubbo:application name="congratulation-service-provider"/>
 
     <!-- 指定注册中心地址 -->
     <dubbo:registry address="zookeeper://139.196.140.168:2181"/>
 
     <!-- 使用 Dubbo 原生协议在 20880 端口上暴露服务 -->
-    <dubbo:protocol name="dubbo" port="20880"/>
+    <dubbo:protocol name="dubbo" port="20882"/>
 
-    <dubbo:reference id="congratulationService" check="false" interface="com.xlh.dubbo.zipkin.demo.api.CongratulationService" filter="tracing"/>
+    <!-- 将 CongratulationServiceImpl 的实现声明成一个 spring bean -->
+    <bean id="congratulationService" class="com.xlh.dubbo.zipkin.demo.service.congratulation.CongratulationServiceImpl"/>
 
-    <!-- 将 HelloServiceImpl 的实现声明成一个 spring bean -->
-    <bean id="helloService" class="com.xlh.dubbo.zipkin.demo.service.hello.HelloServiceImpl">
-        <property name="congratulationService" ref="congratulationService" />
-    </bean>
+    <!-- 将 HelloServiceImpl 声明成一个 Dubbo 服务 -->
+    <dubbo:service interface="com.xlh.dubbo.zipkin.demo.api.CongratulationService" ref="congratulationService"/>
 
     <!-- 1. 修改 dubbo 服务暴露配置，在 filter chain 中增加 zipkin 的 tracing 过滤器 -->
-    <dubbo:service interface="com.xlh.dubbo.zipkin.demo.api.HelloService" ref="helloService" filter="tracing"/>
+    <dubbo:service interface="com.xlh.dubbo.zipkin.demo.api.CongratulationService" ref="congratulationService" filter="tracing"/>
 
     <!-- 2. zipkin 相关的配置 -->
     <!-- 使用 OKHttp 来发送 trace 信息到 Zipkin Server。这里的 Zipkin Server 启动在本地 -->
@@ -32,7 +31,7 @@
     </bean>
 
     <bean id="tracing" class="brave.spring.beans.TracingFactoryBean">
-        <property name="localServiceName" value="hello-service"/>
+        <property name="localServiceName" value="congratulation-service"/>
         <property name="spanReporter">
             <bean class="zipkin2.reporter.beans.AsyncReporterFactoryBean">
                 <property name="sender" ref="sender"/>
